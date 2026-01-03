@@ -1,5 +1,9 @@
+import com.dampcake.bencode.Type;
 import com.google.gson.Gson;
-// import com.dampcake.bencode.Bencode;
+
+import java.io.IOException;
+import java.io.InputStream;
+import com.dampcake.bencode.Bencode;
 
 public class Main {
     private static final Gson gson = new Gson();
@@ -11,7 +15,9 @@ public class Main {
             String bencodedValue = args[1];
             Object decoded;
             try {
-                decoded = decodeBencode(bencodedValue);
+                Bencode bencode=new Bencode();
+                Type type = bencode.type(bencodedValue.getBytes());
+                decoded = bencode.decode(bencodedValue.getBytes(), type);
             } catch (RuntimeException e) {
                 System.out.println(e.getMessage());
                 return;
@@ -24,23 +30,6 @@ public class Main {
 
     }
 
-    static Object decodeBencode(String bencodedString) {
-        if (Character.isDigit(bencodedString.charAt(0))) {
-            int firstColonIndex = 0;
-            for (int i = 0; i < bencodedString.length(); i++) {
-                if (bencodedString.charAt(i) == ':') {
-                    firstColonIndex = i;
-                    break;
-                }
-            }
-            int length = Integer.parseInt(bencodedString.substring(0, firstColonIndex));
-            return bencodedString.substring(firstColonIndex + 1, firstColonIndex + 1 + length);
-        } else if (bencodedString.charAt(0) == 'i') {
-            int integerEndingIndex=bencodedString.indexOf('e');
-            return Long.parseLong(bencodedString.substring(1,integerEndingIndex));
-        } else {
-            throw new RuntimeException("Only strings are supported at the moment");
-        }
-    }
+
 
 }
